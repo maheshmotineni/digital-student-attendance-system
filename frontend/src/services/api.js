@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5001/api",
+  baseURL: "https://digital-student-attendance-system.onrender.com/api",
 });
 
-const API_URL = "https://digital-student-attendance-system.onrender.com/api";
+
 
 // Add token automatically
 API.interceptors.request.use((req) => {
