@@ -4,6 +4,8 @@ const API = axios.create({
   baseURL: "http://localhost:5001/api",
 });
 
+const API_URL = "https://digital-student-attendance-system.onrender.com/api";
+
 // Add token automatically
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
