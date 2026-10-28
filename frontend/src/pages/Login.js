@@ -1,66 +1,75 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";   // IMPORTANT
+import { Link, useNavigate } from "react-router-dom";
+import API from "../services/api";
 
 function Login() {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const navigate = useNavigate();   // create navigate
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  const handleLogin = () => {
+    try {
+      const response = await API.post("/auth/login", {
+        email,
+        password,
+      });
 
-    fetch("http://localhost:5001/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    })
-    .then(res => res.json())
-    .then(data => {
+      const { token, user } = response.data;
 
-      if (data.user) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        navigate("/admin/dashboard");   // redirect after login
-
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else if (user.role === "teacher") {
+        navigate("/teacher");
+      } else if (user.role === "student") {
+        navigate("/student");
       } else {
-        alert("Invalid login");
+        setError("Invalid user role");
       }
-
-    })
-    .catch(err => console.log(err));
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
+    }
   };
 
   return (
-    <div className="container mt-5">
-
+    <div className="login-container">
       <h2>Login</h2>
 
-      <input
-        type="email"
-        placeholder="Email"
-        className="form-control mb-3"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-      <input
-        type="password"
-        placeholder="Password"
-        className="form-control mb-3"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-      <button className="btn btn-primary" onClick={handleLogin}>
-        Login
-      </button>
+        <button type="submit">Login</button>
+      </form>
 
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <p>
+        Don't have an account? <Link to="/register">Register here</Link>
+      </p>
     </div>
   );
 }
-
-
 
 export default Login;
