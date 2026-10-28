@@ -21,4 +21,7 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/qr", qrRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Advanced Digital Student Attendance System API is Running!");
+});
 app.listen(5001, () => console.log("Server running on port 5001"));
